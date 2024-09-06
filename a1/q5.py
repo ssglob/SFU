@@ -7,3 +7,6 @@
 #
 
 # ... put your answer to question 5 here ...
+import random
+def rand_char():
+    n = input("")
