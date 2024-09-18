@@ -1,9 +1,9 @@
 # q3.py
 
 #
-# Full Name:
-#  SFU ID #:
-# SFU Email:
+# Full Name: Edward Li Xuan Luo
+#  SFU ID #: 301628166
+# SFU Email:ell13@sfu.ca
 #
 '''Put your answer to this question in q3.py.
 
@@ -31,4 +31,6 @@ Assume the user enters a single character for the box character.'''
 # ... put your answer to question 3 here ...
 text = input("What do you want your sign to say? ")
 char = input("What character do you want for the box? ")
+
+#4 extra characters, / (msg) /
 print(f"{(len(text) + 4) * char}\n{char + " " + text + " " + char}\n{(len(text) + 4) * char}")

@@ -1,9 +1,9 @@
 # q2.py
 
 #
-# Full Name:
-#  SFU ID #:
-# SFU Email:
+# Full Name: Edward Li Xuan Luo
+#  SFU ID #: 301628166
+# SFU Email:ell13@sfu.ca
 #
 '''Put your answer to this question in q2.py.
 
@@ -18,7 +18,6 @@ Use f-strings to format your output. It should work for any number the user ente
 
 You can assume the user enters a valid number.'''
 # ... put your answer to question 2 here ...
-feet = input("How many feet? ")
-meters = float(feet) * .3048
-feet = float(feet)
+feet = float(input("How many feet? "))
+meters = feet * .3048
 print(f"{feet:,.1f} feet is about {meters:,.1f} meters.")
