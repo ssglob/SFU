@@ -19,8 +19,13 @@ You don't need to do any error checking: assume a sensible name and integer age 
 # ... put your answer to question 1 here ...
 
 #Credits: found datetime at https://stackoverflow.com/questions/28189442/datetime-current-year-and-month-in-python
+
+#import datetime to get the current year
 from datetime import datetime
+#get the inputs
 name = input("What's your name? ")
 age = int(input("How old are you? "))
+#calculate the year in 25 years
 year_plus_25 = datetime.now().year + 25
+#print the results
 print(f"Hi {name}! In 25 years it will be {year_in_25} and you will be {age + 25:,} years old.")

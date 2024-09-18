@@ -18,6 +18,10 @@ Use f-strings to format your output. It should work for any number the user ente
 
 You can assume the user enters a valid number.'''
 # ... put your answer to question 2 here ...
+
+#get the input
 feet = float(input("How many feet? "))
+#do conversion to meters
 meters = feet * .3048
+#print the result
 print(f"{feet:,.1f} feet is about {meters:,.1f} meters.")

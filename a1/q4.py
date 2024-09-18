@@ -34,9 +34,12 @@ The formulas for the volumes of spheres and cones can be found online.'''
 #Credits: https://www.w3schools.com/python/ref_math_pi.asp for teaching me how to use pi in python
 #         https://byjus.com/volume-formulas/ for providing volume formulas
 
+#import pi so that I can use it for the volume formula
 from math import pi
+#print the sign
 print("+-----------------------+\n| Welcome to CyberCone! |\n+-----------------------+")
 
+#get inputs and print to confirm the inputs
 scoops = int(input("How many scoops do you want? "))
 print(f"Ok, {scoops} scoops it is.")
 
@@ -46,8 +49,10 @@ print(f"Each scoop is radius {radius:,.2f}cm")
 height = float(input("What is the height of the cone in cm? "))
 print(f"Cone height is {height:,.2f}cm")
 
+#do the calculations for the total height and the cost
 totalheight = height + (scoops * 2 * radius)
 cost = (scoops * (4/3) * pi * (radius ** 3) * 0.75) + ((1/3) * pi * (radius ** 2) * height * 0.25)
 
+#print the results
 print(f"Cost of your {scoops}-scoop cone: ${cost:,.2f}")
 print(f"Total height of your {scoops}-scoop cone: {totalheight:,.2f}cm")
