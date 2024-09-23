@@ -20,6 +20,4 @@ for integer in range(n):
     for integers1 in range(2*n):
         print(rand_char(), end = '')
     #until the last loop, print a line break to separate each line
-    #don't want it on the last loop because it will print an extra unneeded line
-    if integer != n-1:
-        print('\n')
+    print()
