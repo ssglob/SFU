@@ -10,19 +10,12 @@
 
 #
 # import the turtle module
-# import math for question 3
-# import random for question 7
+# import math for question 3 and 6
+# import random for question 7, 8, and 9
 #
 import turtle as t
 import math
 import random as r
-
-#
-# this makes it so that we don't see the turtle drawing, and we update at the end to see whatever the turtle 
-# drew, making it a lot faster.
-#
-t.hideturtle()
-t.tracer(0,0)
 
 #
 # set t.colormode to 255 so that I can use random rgb values in question 8
@@ -409,11 +402,3 @@ def crowd(n, min_size, max_size):
         rand_y = r.randint(-height+max_size*2,height-max_size*2)
         jump_to(rand_x,rand_y)
         stick_figure(r.randint(min_size,max_size))
-stick_figure(100)
-
-#
-# Just so that the window isn't removed right away, remove before turning in
-# update so that we can see the result
-#
-t.update()
-t.mainloop()
