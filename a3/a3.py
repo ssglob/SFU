@@ -17,9 +17,6 @@
 import turtle as t
 import math
 import a2
-t.Screen().tracer(0)
-t.hideturtle()
-
 #
 # define is_int (question 1)
 #
@@ -151,8 +148,8 @@ def figure_row(x, y, n):
     #
     # set a min for spacing so that the stick figures don't overlap
     #
-    if spacing<=size:
-        spacing += size
+    if spacing<=size*2:
+        spacing += size*2
     #
     # now just draw the row of stick figures
     # stick_figure draws a stick figure centered on (x,y)
