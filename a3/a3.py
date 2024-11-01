@@ -17,6 +17,8 @@
 import turtle as t
 import math
 import a2
+t.tracer(0)
+t.hideturtle()
 #
 # define is_int (question 1)
 #
@@ -68,7 +70,8 @@ def ask_int2(prompt):
 
 def ask_int_between(lo,hi):
     #
-    # while loop, if user enters invalid int or int not in between lo and hi print error and ask again
+    # while loop, if user enters invalid int or int not in 
+    # between lo and hi print error and ask again
     #
     a = ''
     while not is_int(a) or a<lo or a>hi:
@@ -136,8 +139,8 @@ def figure_row(x, y, n):
     #
     spacing = t.screensize()[0] * 2
     #
-    # subtract spacing by the distance from the left border to x so we know how much space we have on 
-    # the right of (x,y)
+    # subtract spacing by the distance from the left border to x so we know how much 
+    # space we have on the right of (x,y)
     #
     spacing -= t.screensize()[0]+x
     #
@@ -152,8 +155,7 @@ def figure_row(x, y, n):
         spacing += size*2
     #
     # now just draw the row of stick figures
-    # stick_figure draws a stick figure centered on (x,y)
-    # since we want (x,y) to be the bottom left corner, we need to move the turtle before drawing
+    # need to move turtle to draw stick figure with (x,y) as the bottom left corner
     #
     position = (x+size+math.sin(math.pi/4)*size/4, y+size+math.sin(math.pi/4)*size/2)
     for i in range(n):
@@ -190,3 +192,7 @@ def figure_grid(x, y, r, c):
     for i in range(r):
         figure_row(position[0],position[1],c)
         position = (position[0],position[1]-spacing)
+figure_row(-400,0,100)
+
+t.update()
+t.mainloop()
