@@ -1,4 +1,4 @@
-f = open('SFU\\a4.py','r')
+f = open('SFU\\a5.py','r')
 l = f.readlines()
 f.close()
 a = []
