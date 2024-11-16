@@ -11,9 +11,6 @@
 #
 import turtle as t
 
-t.tracer(0)
-t.hideturtle()
-
 #
 # define turtle_draw1(commands, step_size, turning_angle) (question 1)
 #
@@ -48,9 +45,9 @@ def turtle_draw3(commands, step_size, turning_angle):
     for char in commands:
         if char == 'F' or char == 'G':
             t.forward(step_size)
-        elif char == 'L' or char == '-':
+        elif char == 'L' or char == '+':
             t.left(turning_angle)
-        elif char == 'R' or char == '+':
+        elif char == 'R' or char == '-':
             t.right(turning_angle)
         elif char == 'U':
             t.penup()
@@ -99,6 +96,16 @@ def is_turtle_list(x):
         return False
     return True
 
+#
+# define draw_turtle_list(lst) (question 6)
+#
+def draw_turtle_list(lst):
+    if not is_turtle_list(lst):
+        print(f'error: {lst} is not a valid turtle list')
+        return
+    turtle_draw3(lst[2],lst[0],lst[1])
 
-t.update()
+def make_dragon_list(n, step_size):
+    return [step_size,90,repeat_rule(n, dragon_rule, 'F')]
+draw_turtle_list(make_dragon_list(5,90))
 t.mainloop()
