@@ -27,7 +27,6 @@ def compare(roll1,roll2):
     # Conditions: roll1 rank == roll2 rank
     #
     roll_vals = [100, 2, 3, 4, 5, 60]
-
     if roll1==roll2: # If they are tied (456 and 123 included)
         return 't'
 
@@ -64,8 +63,13 @@ def humanturn(max_rolls,prev_rolls):
 |     |   |     |   |     |
 +-----+   +-----+   +-----+'''.strip() #Just add the o character to each dice
     dice = [list(i) for i in dice.split('\n')] # make the dice easier to edit
+    #
     # for the coordinates of o, define a list and the index for the correct dice is roll-1
-    dice_coords = [[[1,3]],[[1,2],[3,4]],[[1,2],[3,3],[3,4]], [[1,2],[3,4]]]
+    #
+    dice_coords = [
+        [[2,3]], [[1,2],[3,4]], [[1,2],[2,3],[3,4]], [[1,2],[1,4],[3,2],[3,4]], 
+        [[1,2],[1,4],[2,3],[3,2],[3,4]], [[1,2],[1,4],[2,2],[2,4],[3,2],[3,4]]
+        ]
 
     roll_again = True # Make it false if the user doesn't want to roll again
     rolls = [] # Using a list, we can easily store the result of each roll
@@ -75,28 +79,45 @@ def humanturn(max_rolls,prev_rolls):
         rolls = [random.randint(1,6) for i in range(3)]
 
         print("Your rolls:")
-        cur_dice = dice[:]
 
-        for count in range(len(rolls)):
+        #copy the empty die
+        cur_dice = [[] for i in dice]
+        for c,i in enumerate(dice):
+            cur_dice[c] = i[:]
+
+        for count in range(3):
             #get coordinates of o relative to which dice the loop is on 
-            coords = [[i[count][0],i[count][1] + count*10] for i in dice_coords[rolls[count]-1]]
+            coords = [[i[0],i[1] + count*10] for i in dice_coords[rolls[count]-1]]
             for item in coords:
                 cur_dice[item[0]][item[1]] = 'o'
-        
-        print(''.join(cur_dice))
+        print('\n'.join([''.join(i) for i in cur_dice]))
+        print(rolls)
         print(f'Rolls left: {max_rolls-rolls_used}.',end=' ')
-        print(f'Previous rolls during this round: {' '.join(prev_rolls)}')
+        
+        #
+        # make prev_rolls nicer to look at for the user
+        #
+        prev_rolls_as_str = []
+        for lst in prev_rolls:
+            string = ''
+            for number in lst:
+                string += str(number)
+            prev_rolls_as_str.append(string)
+        prev_rolls_as_str = ', '.join(prev_rolls_as_str)
+        print(f'Previous rolls during this round: {prev_rolls_as_str}')
 
         yesorno = ' '
+        if max_rolls-rolls_used > 0:
+            yesorno = input('Roll again? y/n: ')
+            while not yesorno in 'yn':
+                print("Invalid input. Try again. Enter y for yes and n for no.")
+                yesorno = input('Roll again? y/n: ')
 
-        while not yesorno in 'yn':
-            yesorno = input('Roll again? y/n')
-
-        if yesorno == 'n':
-            roll_again == False
-            break
-
-    return [rolls.sort(),rolls_used] #Return sorted rolls because it's easier to work with
+            if yesorno == 'n':
+                roll_again == False 
+                break
+    rolls.sort() #Return sorted rolls because it's easier to work with
+    return [rolls,rolls_used]
 
 #
 # Define a function for robot turn
@@ -104,15 +125,14 @@ def humanturn(max_rolls,prev_rolls):
 #
 def robotturn(max_rolls,Lowest_roll):
     '''CPU should try to roll until they beat the lowest roll, because the most
-    important thing is to not lose.'''
+    important thing is to not lose. It does not matter if they have the highest score.'''
     rolls_used = 0
     rolls = [] # Using a list, we can easily store the result of each roll
 
     while rolls_used < max_rolls:
         rolls_used += 1
         rolls = [random.randint(1,6) for i in range(3)]
-        rolls.sort()
-        print(rolls)
+        rolls.sort() # sort rolls because it's easier to work with
         if rolls == [4,5,6]:
             break
         score = 1
@@ -127,7 +147,7 @@ def robotturn(max_rolls,Lowest_roll):
                 if compare(Lowest_roll[1],rolls):
                     break
 
-    return [rolls,rolls_used] #Return sorted rolls because it's easier to work with
+    return [rolls,rolls_used] 
 
 #
 # Define a function to print the round
@@ -175,13 +195,13 @@ def game():
     #
     # start rounds
     #
+    game_over = False
     cur_round = 1
-    while not 0 in chips.values():
+    while not game_over:
         #
         # print and update current round
         #
-        roundinbox = printround(cur_round)
-        print(roundinbox)
+        print(printround(cur_round))
         cur_round += 1
 
         #
@@ -197,17 +217,17 @@ def game():
         prev_rolls = []
         Highest_roll = [] # [score, hand, player]
         Lowest_roll = [] # [score, hand, player]
-        HTied = [] # with highest roll, if a new highest roll is created then clear it
-        LTied = [] # with Lowest roll, if a new lowest roll is created then clear it
+        HTied = [] # list of all rolls tied with highest roll, clear after new highest roll
+        LTied = [] # lis tall rolls tied with with Lowest roll, clear after new lowest roll
 
         for n in range(4):
             cur_player = players.pop(random.randint(0,3-n))
 
             if cur_player == username:
-                round_rolls[cur_player] = humanturn(max_rolls,round_rolls)
-                continue
+                round_rolls[cur_player],numofrolls = humanturn(max_rolls,list(round_rolls.values()))
 
-            round_rolls[cur_player],numofrolls = robotturn(max_rolls,Lowest_roll)
+            else:
+                round_rolls[cur_player],numofrolls = robotturn(max_rolls,Lowest_roll)
             max_rolls = min(max_rolls,numofrolls)
             prev_rolls.append(round_rolls[cur_player])
 
@@ -275,10 +295,13 @@ def game():
         for key in chips:
             if key == loser:
                 chips[key] += Highest_roll[0] * 3
-            else:
+            else:   
                 chips[key] -= Highest_roll[0]
+            if chips[key] <= 0:
+                chips[key] = 0
+                game_over = True
         
-        print(f'The winner of this round was {winner}. The loser of this round was {loser}')
+        print(f'The winner of this round was {winner}. The loser of this round was {loser}.')
     highest_chips = 0 # loser
     winners = []
     losers = []
@@ -295,7 +318,7 @@ def game():
         
     print(f'''Winner of the game was {winners[random.randint(0,len(winners)-1)]}
             Loser of the game was {losers[random.randint(0,len(losers)-1)]}''')
-    print(f'\nFinal scores were:')
+    print(f'\nFinal chips of each player:')
 
     for key in chips:
         print(f'{key}: {chips[key]}')

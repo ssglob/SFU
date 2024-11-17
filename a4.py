@@ -105,6 +105,9 @@ def draw_turtle_list(lst):
         return
     turtle_draw3(lst[2],lst[0],lst[1])
 
+#
+# define make_dragon_list (question 7)
+#
 def make_dragon_list(n, step_size):
     return [step_size,90,repeat_rule(n, dragon_rule, 'F')]
 draw_turtle_list(make_dragon_list(5,90))
