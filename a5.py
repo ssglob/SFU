@@ -109,9 +109,11 @@ def humanturn(max_rolls,prev_rolls):
         yesorno = ' '
         if max_rolls-rolls_used > 0:
             yesorno = input('Roll again? y/n: ')
+            print()
             while not yesorno in 'yn':
                 print("Invalid input. Try again. Enter y for yes and n for no.")
                 yesorno = input('Roll again? y/n: ')
+                print()
 
             if yesorno == 'n':
                 roll_again == False 
@@ -286,6 +288,7 @@ def game():
                     LTied.append(cur_player)
                 elif lower == '2':
                     continue
+            
         #
         # decide winner/loser and calculate chips
         #
@@ -302,6 +305,7 @@ def game():
                 game_over = True
         
         print(f'The winner of this round was {winner}. The loser of this round was {loser}.')
+        print()
     highest_chips = 0 # loser
     winners = []
     losers = []
