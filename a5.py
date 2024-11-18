@@ -15,8 +15,8 @@
 #
 
 #
-# import random for random turn order every round
-# import time so that each print is not instant
+# Import random for random turn order every round
+# Import time so that each print is not instant
 #
 import random
 import time
@@ -28,7 +28,7 @@ def compare(roll1,roll2):
     #
     # Conditions: roll1 rank == roll2 rank
     #
-    roll_vals = [100, 2, 3, 4, 5, 60] # index for number's value is number-1
+    roll_vals = [100, 2, 3, 4, 5, 60] # Index for number's value is number-1
     if roll1==roll2: # If they are tied (456 and 123 included)
         return 't'
 
@@ -37,7 +37,7 @@ def compare(roll1,roll2):
             return '1'
         else:
             return '2'
-    else: # if both highest rank and current rank == 1
+    else: # If both highest rank and current rank==1
         dice_sum1 = sum([roll_vals[i-1] for i in roll1])
         dice_sum2 = sum([roll_vals[i-1] for i in roll2])
         if dice_sum1==dice_sum2:
@@ -82,7 +82,9 @@ def humanturn(max_rolls,prev_rolls):
 
         print("Your rolls:")
 
-        #copy the empty die
+        #
+        # Copy the empty die
+        #
         cur_dice = [[] for i in dice]
         for c,i in enumerate(dice):
             cur_dice[c] = i[:]
@@ -92,19 +94,22 @@ def humanturn(max_rolls,prev_rolls):
             coords = [[i[0],i[1] + count*10] for i in dice_coords[rolls[count]-1]]
             for item in coords:
                 cur_dice[item[0]][item[1]] = 'o'
+
         print('\n'.join([''.join(i) for i in cur_dice]))
         print(rolls)
         print(f'Rolls left: {max_rolls-rolls_used}.',end=' ')
         
         #
-        # make prev_rolls nicer to look at for the user
+        # Make prev_rolls nicer to look at for the user
         #
         prev_rolls_as_str = []
         for lst in prev_rolls:
             string = ''
             for number in lst:
                 string += str(number)
+
             prev_rolls_as_str.append(string)
+
         prev_rolls_as_str = ', '.join(prev_rolls_as_str)
         print(f'Previous rolls during this round: {prev_rolls_as_str}')
 
@@ -116,12 +121,13 @@ def humanturn(max_rolls,prev_rolls):
                 print("Invalid input. Try again. Enter y for yes and n for no.")
                 yesorno = input('Roll again? y/n: ')
 
-            if yesorno == 'n':
-                roll_again == False 
+            if yesorno=='n':
+                roll_again==False 
                 break
+
     time.sleep(1.0)
     print()
-    rolls.sort() #Return sorted rolls because it's easier to work with
+    rolls.sort() # Return sorted rolls because it's easier to work with
     return [rolls,rolls_used]
 
 #
@@ -139,23 +145,25 @@ def robotturn(max_rolls,Lowest_roll):
         rolls_used += 1
         rolls = [random.randint(1,6) for i in range(3)]
         rolls.sort() # sort rolls because it's easier to work with
-        if rolls == [4,5,6]:
+        if rolls==[4,5,6]:
             break
         rank = 1
-        if rolls == [1,2,3]:
+        if rolls==[1,2,3]:
             rank = 2
-        elif rolls.count(rolls[0]) == 3:
+        elif rolls.count(rolls[0])==3:
             rank = 3
+
         if Lowest_roll:
             if Lowest_roll[0]<rank:
                 break
             elif Lowest_roll[0]==rank:
                 if compare(Lowest_roll[1],rolls):
                     break
+
         else:
             if rolls in [[1,2,3],[4,5,6]]: # Poco or Loco
                 break
-            elif rolls.count(rolls[0]) == 3: # Three of a kind
+            elif rolls.count(rolls[0])==3: # Three of a kind
                 break
 
     return [rolls,rolls_used] 
@@ -215,12 +223,11 @@ If there is a tie, the winner and loser are randomly selected.
     # Define a dictionary that holds the chips of each player
     # The computers are p# where # is an integer greater than 1
     # Player is username
-    # Define another dictionary for special rolls, another one for roll values
     #
     chips = {username: chipnum, 'p2': chipnum, 'p3': chipnum, 'p4': chipnum}
 
     #
-    # start rounds
+    # Start rounds
     #
     game_over = False
     cur_round = 1
@@ -259,7 +266,7 @@ If there is a tie, the winner and loser are randomly selected.
         order = [players.pop(random.randint(0,3-n)) for n in range(4)]
         print('Order for this round:')
         #
-        # print the order
+        # Print the order
         #
         for count,item in enumerate(order):
             print(f'{count+1}: {item}')
@@ -267,7 +274,7 @@ If there is a tie, the winner and loser are randomly selected.
         time.sleep(2.0)
 
         for cur_player in order:
-            if cur_player == username:
+            if cur_player==username:
                 player_turn = humanturn(max_rolls,list(round_rolls.values()))
                 round_rolls[cur_player],numofrolls = player_turn
 
@@ -281,11 +288,11 @@ If there is a tie, the winner and loser are randomly selected.
             #
             cur_roll = round_rolls[cur_player]
 
-            if cur_roll == [4,5,6]:
+            if cur_roll==[4,5,6]:
                 player_rank = 4
-            elif cur_roll.count(cur_roll[0]) == 3:
+            elif cur_roll.count(cur_roll[0])==3:
                 player_rank = 3
-            elif cur_roll == [1,2,3]:
+            elif cur_roll==[1,2,3]:
                 player_rank = 2
             else:
                 player_rank = 1
@@ -306,22 +313,22 @@ If there is a tie, the winner and loser are randomly selected.
                 LTied = [cur_player]
             
             #
-            # use compare function to compare the rolls
+            # Use compare function to compare the rolls
             #
             else:
                 if player_rank==Highest_roll[0]:
                     higher = compare(Highest_roll[1],cur_roll)
-                    if higher == 't':
+                    if higher=='t':
                         HTied.append(cur_player)
-                    elif higher == '2':
+                    elif higher=='2':
                         Highest_roll = [player_rank,cur_roll,cur_player]
                         HTied = [cur_player]
 
                 if player_rank==Lowest_roll[0]:
                     lower = compare(Lowest_roll[1],cur_roll)
-                    if lower == 't':
+                    if lower=='t':
                         LTied.append(cur_player)
-                    elif lower == '1':
+                    elif lower=='1':
                         Lowest_roll = [player_rank,cur_roll,cur_player]
                         LTied = [cur_player]
             
@@ -332,7 +339,7 @@ If there is a tie, the winner and loser are randomly selected.
         loser = LTied[random.randint(0,len(LTied)-1)] # same as choosing winner
 
         for key in chips:
-            if key == loser:
+            if key==loser:
                 chips[key] += Highest_roll[0] * 3
             else:   
                 chips[key] -= Highest_roll[0]
@@ -348,22 +355,21 @@ If there is a tie, the winner and loser are randomly selected.
         print(f'The winner of this round was {winner}. The loser of this round was {loser}.')
         print()
         #
-        # ask for input so the user decides when to continues to the next round
+        # Ask for input so the user decides when to continues to the next round
         #
         input("Enter any key to continue to the next round. ")
         print()
 
-    highest_chips = 0 # loser
+    highest_chips = 0 # Loser has the highest chips
     winners = []
     losers = []
 
     for key in chips:
-        if chips[key] == 0:
+        if chips[key]==0:
             winners.append(key)
         elif chips[key]>highest_chips:
             highest_chips = chips[key]
-            losers.clear()
-            losers.append(key)
+            loser = [key]
         elif chips[key]==highest_chips:
             losers.append(key)
     
