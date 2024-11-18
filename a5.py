@@ -328,8 +328,6 @@ If there is a tie, the winner and loser are randomly selected.
         #
         # decide winner/loser and calculate chips
         #
-        print(LTied)
-        print(HTied)
         winner = HTied[random.randint(0,len(HTied)-1)] # choose random winner if there is a tie
         loser = LTied[random.randint(0,len(LTied)-1)] # same as choosing winner
 
