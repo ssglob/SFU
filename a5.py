@@ -173,8 +173,8 @@ def robotturn(max_rolls,Lowest_roll):
 #
 def printround(cur_round):
     #
-    # border is made up of + and -
-    # there are 8 -'s for 3 spaces and 5 letters in round, + # of digits in cur_round
+    # Border is made up of + and -
+    # There are 8 -'s for 3 spaces and 5 letters in round, + # of digits in cur_round
     #
     border = f'+{'-'*(8+len(str(cur_round)))}+'
     return f'{border}\n| Round {cur_round} |\n{border}'
