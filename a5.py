@@ -63,8 +63,12 @@ def humanturn(max_rolls,prev_rolls):
 |     |   |     |   |     |
 |     |   |     |   |     |
 |     |   |     |   |     |
-+-----+   +-----+   +-----+'''.strip() # Just add the o characters to each dice
-    dice = [list(i) for i in dice.split('\n')] # Make the dice easier to edit
++-----+   +-----+   +-----+
+   #         #         #'''.strip() # Just add the o characters to each dice
+    #
+    # Make the dice easier to edit by making it a list
+    #
+    dice = [list(i) for i in dice.split('\n')] 
     #
     # For the coordinates of o, define a list and the index for the correct dice is roll-1
     #
@@ -95,23 +99,33 @@ def humanturn(max_rolls,prev_rolls):
             for item in coords:
                 cur_dice[item[0]][item[1]] = 'o'
 
+        #
+        # Replace '#'s in the dice with the number that dice rolled
+        #
+        for num in rolls:
+            ind = cur_dice[-1].index('#')
+            cur_dice[-1][ind] = str(num)
+
         print('\n'.join([''.join(i) for i in cur_dice]))
-        print(rolls)
         print(f'Rolls left: {max_rolls-rolls_used}.',end=' ')
         
         #
         # Make prev_rolls nicer to look at for the user
         #
-        prev_rolls_as_str = []
-        for lst in prev_rolls:
-            string = ''
-            for number in lst:
-                string += str(number)
+        if prev_rolls:
+            prev_rolls_as_str = []
+            for lst in prev_rolls:
+                string = ''
+                for number in lst:
+                    string += str(number)
 
-            prev_rolls_as_str.append(string)
+                prev_rolls_as_str.append(string)
 
-        prev_rolls_as_str = ', '.join(prev_rolls_as_str)
-        print(f'Previous rolls during this round: {prev_rolls_as_str}')
+            prev_rolls_as_str = ', '.join(prev_rolls_as_str)
+            print(f'Previous rolls during this round: {prev_rolls_as_str}')
+        
+        else:
+            print('There were no previous rolls during this round.')
 
         yesorno = ' '
         if max_rolls-rolls_used > 0:
@@ -138,7 +152,7 @@ def robotturn(max_rolls,Lowest_roll):
     '''CPU should try to roll until they beat the lowest roll, because the most
     important thing is to not lose. It does not matter if they have the highest rank.
     If it's first then it should try to roll until it gets a Loco, a three-of-a-kind,
-    or a Poco'''
+    a Poco, or have a 1 or two 6's in the roll'''
     rolls_used = 0
 
     while rolls_used < max_rolls:
@@ -157,13 +171,15 @@ def robotturn(max_rolls,Lowest_roll):
             if Lowest_roll[0]<rank:
                 break
             elif Lowest_roll[0]==rank:
-                if compare(Lowest_roll[1],rolls):
+                if compare(Lowest_roll[1],rolls) == '2':
                     break
 
         else:
             if rolls in [[1,2,3],[4,5,6]]: # Poco or Loco
                 break
             elif rolls.count(rolls[0])==3: # Three of a kind
+                break
+            elif 1 in rolls or (6 in rolls and rolls.count(6)>1):
                 break
 
     return [rolls,rolls_used] 
@@ -190,7 +206,7 @@ def game():
     chipnum = input("How many chips do you want everyone to start with? ")
     while not chipnum.isdigit():
         print("Please enter a positive integer.")
-        input("How many chips do you want everyone to start with? ")
+        chipnum = input("How many chips do you want everyone to start with? ")
     chipnum = int(chipnum)
 
     print()
@@ -337,30 +353,34 @@ If there is a tie, the winner and loser are randomly selected.
         #
         winner = HTied[random.randint(0,len(HTied)-1)] # choose random winner if there is a tie
         loser = LTied[random.randint(0,len(LTied)-1)] # same as choosing winner
+        chip_diff = {}
 
         for key in chips:
             if key==loser:
                 chips[key] += Highest_roll[0] * 3
+                chip_diff[key] = '+' + str(Highest_roll[0] * 3)
             else:   
                 chips[key] -= Highest_roll[0]
+                chip_diff[key] = '-' + str(Highest_roll[0])
             if chips[key] <= 0:
                 chips[key] = 0
                 game_over = True
         
         print('Rolls from this round (sorted):')
         for key in chips:
-            print(f'{key}: {round_rolls[key]}')
+            print(f'{key}: {''.join([str(i) for i in round_rolls[key]])}',end=' ')
+            print(f'({chip_diff[key]} chips)')
         print()
         
         print(f'The winner of this round was {winner}. The loser of this round was {loser}.')
         print()
         #
-        # Ask for input so the user decides when to continues to the next round
+        # Ask for input so the user decides when to continue to the next round
         #
         input("Enter any key to continue to the next round. ")
         print()
 
-    highest_chips = 0 # Loser has the highest chips
+    highest_chips = 0 # Loser has the highest chips, there must be at least 1 loser
     winners = []
     losers = []
 
@@ -369,7 +389,7 @@ If there is a tie, the winner and loser are randomly selected.
             winners.append(key)
         elif chips[key]>highest_chips:
             highest_chips = chips[key]
-            loser = [key]
+            losers = [key]
         elif chips[key]==highest_chips:
             losers.append(key)
     
