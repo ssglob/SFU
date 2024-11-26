@@ -22,13 +22,19 @@ import random
 import time
 
 #
+# Define a function to add the score of a roll
+#
+def add_score(roll):
+    roll_vals = [100, 2, 3, 4, 5, 60] # Index for number's value is number-1
+    return sum([roll_vals[i-1] for i in roll])
+
+#
 # Define a function to compare two rolls
 #
 def compare(roll1,roll2):
     #
     # Conditions: roll1 rank == roll2 rank
     #
-    roll_vals = [100, 2, 3, 4, 5, 60] # Index for number's value is number-1
     if roll1==roll2: # If they are tied (456 and 123 included)
         return 't'
 
@@ -38,8 +44,8 @@ def compare(roll1,roll2):
         else:
             return '2'
     else: # If both highest rank and current rank==1
-        dice_sum1 = sum([roll_vals[i-1] for i in roll1])
-        dice_sum2 = sum([roll_vals[i-1] for i in roll2])
+        dice_sum1 = add_score(roll1)
+        dice_sum2 = add_score(roll2)
         if dice_sum1==dice_sum2:
             return 't'
         elif dice_sum1>dice_sum2:
@@ -190,7 +196,7 @@ def game():
     chipnum = input("How many chips do you want everyone to start with? ")
     while not chipnum.isdigit():
         print("Please enter a positive integer.")
-        input("How many chips do you want everyone to start with? ")
+        chipnum = input("How many chips do you want everyone to start with? ")
     chipnum = int(chipnum)
 
     print()
@@ -201,7 +207,11 @@ PocoLoco is played in rounds.
 In each round, players take turns rolling three dice and try to get the 
 highest score possible. After all the players have taken their turn in 
 a round, the lowest-scoring player is given chips from the other players 
-as described below.
+as described below. If a player doesn't have a special hand, (Loco, Poco, 
+or three-of-a-kind) then the rank is calculated based on the score. The
+score is calculated by adding the score from each dice. The value of each
+roll is as follows (roll: score):
+1: 100, 2: 2, 3: 3, 4: 4, 5: 5, 6: 60
 
 Lowest-scoring player receives:
 1 chip if the winners score is a points total
@@ -253,6 +263,7 @@ If there is a tie, the winner and loser are randomly selected.
         #
         players = list(chips.keys())
         round_rolls = {}
+        round_roll_names = {}
         max_rolls = 3
         prev_rolls = []
         Highest_roll = [] # [rank, hand, player]
@@ -286,16 +297,22 @@ If there is a tie, the winner and loser are randomly selected.
             #
             # Calculate the roll's rank
             #
+            roll = ''
             cur_roll = round_rolls[cur_player]
 
             if cur_roll==[4,5,6]:
                 player_rank = 4
+                roll = 'PoCo!'
             elif cur_roll.count(cur_roll[0])==3:
                 player_rank = 3
+                roll = 'Three of a kind'
             elif cur_roll==[1,2,3]:
                 player_rank = 2
+                roll = 'Loco!'
             else:
                 player_rank = 1
+                roll = f'score: {str(add_score(cur_roll))}'
+            round_roll_names[cur_player] = roll
 
             #
             # Update Lowest and highest roll
@@ -349,7 +366,8 @@ If there is a tie, the winner and loser are randomly selected.
         
         print('Rolls from this round (sorted):')
         for key in chips:
-            print(f'{key}: {round_rolls[key]}')
+            roll_name = round_roll_names[key]
+            print(f'{key}: {round_rolls[key]} ({roll_name})')
         print()
         
         print(f'The winner of this round was {winner}. The loser of this round was {loser}.')
@@ -369,7 +387,7 @@ If there is a tie, the winner and loser are randomly selected.
             winners.append(key)
         elif chips[key]>highest_chips:
             highest_chips = chips[key]
-            loser = [key]
+            losers = [key]
         elif chips[key]==highest_chips:
             losers.append(key)
     
