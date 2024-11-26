@@ -33,12 +33,17 @@ def add_score(roll):
 #
 def compare(roll1,roll2):
     #
-    # Conditions: roll1 rank == roll2 rank
+    # 1 means roll1 was better, 2 means roll2 was better, t means they're tied
     #
+
+
     if roll1==roll2: # If they are tied (456 and 123 included)
         return 't'
 
     elif roll1.count(roll1[0])==3 and roll2.count(roll2[0])==3: # Both rolls are three in a row
+        #
+        # Any tied three in a rows are caught by the tied condition
+        #
         if roll1[0]>roll2[0]:
             return '1'
         else:
@@ -53,6 +58,43 @@ def compare(roll1,roll2):
         elif dice_sum2>dice_sum1:
             return '2'
         
+#
+# Define a function to sort a list of rolls
+#
+def sort_rolls(dict):
+    players = list(dict.keys())
+    left = [players[0],players[1]]
+    right = [players[2],players[3]]
+    result = []
+    #
+    # Compare rolls on the left and on the right, then merge the sorted lists
+    # The only case in which we must switch the order is if the second player
+    # had a higher roll
+    #
+    if dict[left[0]][1] == dict[left[1]][1]:
+        if compare(dict[left[0]][0],dict[left[1]][0]) == '2':
+            left = left[::-1]
+    elif dict[left[0]][1] < dict[left[1]][1]:
+        left = left[::-1]
+    
+    if dict[right[0]][1] == dict[right[1]][1]:
+        if compare(dict[right[0]][0],dict[right[1]][0]) == '2':
+            right = right[::-1]
+    elif dict[right[0]][1] < dict[right[1]][1]:
+        right = right[::-1]
+    
+    while left and right:
+        if compare(dict[left[0]][0],dict[right[0]][0]) in '1t':
+            result.append(left.pop(0))
+        else:
+            result.append(right.pop(0))
+    if left:
+        result.extend(left)
+    elif right:
+        result.extend(right)
+    
+    return result
+
 #
 # Define a function for the human turn
 # Perform rolls and return a list containing the rolls, and the number of rolls used
@@ -90,7 +132,7 @@ def humanturn(max_rolls,prev_rolls):
         rolls_used += 1
         rolls = [random.randint(1,6) for i in range(3)]
 
-        print("Your rolls:")
+        print("\nYour rolls:")
 
         #
         # Copy the empty die
@@ -213,7 +255,6 @@ def game():
     while not chipnum.isdigit():
         print("Please enter a positive integer.")
         chipnum = input("How many chips do you want everyone to start with? ")
-        chipnum = input("How many chips do you want everyone to start with? ")
     chipnum = int(chipnum)
 
     print()
@@ -251,7 +292,7 @@ If there is a tie, the winner and loser are randomly selected.
     # The computers are p# where # is an integer greater than 1
     # Player is username
     #
-    chips = {username: chipnum, 'p2': chipnum, 'p3': chipnum, 'p4': chipnum}
+    chips = {username: chipnum, 'Player 2': chipnum, 'Player 3': chipnum, 'Player 4': chipnum}
 
     #
     # Start rounds
@@ -308,14 +349,15 @@ If there is a tie, the winner and loser are randomly selected.
 
             else:
                 round_rolls[cur_player],numofrolls = robotturn(max_rolls,Lowest_roll)
+                
             max_rolls = min(max_rolls,numofrolls)
-            prev_rolls.append(round_rolls[cur_player])
+            prev_rolls.append(round_rolls[cur_player][:])
 
             #
             # Calculate the roll's rank
             #
             roll = ''
-            cur_roll = round_rolls[cur_player]
+            cur_roll = round_rolls[cur_player][:]
 
             if cur_roll==[4,5,6]:
                 player_rank = 4
@@ -330,6 +372,7 @@ If there is a tie, the winner and loser are randomly selected.
                 player_rank = 1
                 roll = f'score: {str(add_score(cur_roll))}'
             round_roll_names[cur_player] = roll
+            round_rolls[cur_player] = [round_rolls[cur_player],player_rank]
 
             #
             # Update Lowest and highest roll
@@ -384,12 +427,14 @@ If there is a tie, the winner and loser are randomly selected.
                 chips[key] = 0
                 game_over = True
         
+        sorted_rolls = sort_rolls(round_rolls)
+
         print('Rolls from this round (sorted):')
-        for key in chips:
-            print(f'{key}: {''.join([str(i) for i in round_rolls[key]])}',end=' ')
-            print(f'({chip_diff[key]} chips)')
+        for key in sorted_rolls:
+            player_roll = ''.join([str(i) for i in round_rolls[key][0]])
             roll_name = round_roll_names[key]
-            print(f'{key}: {round_rolls[key]} ({roll_name})')
+            print(f'{key}: {player_roll} ({roll_name})',end=' ')
+            print(f'{chip_diff[key]} chips')
         print()
         
         print(f'The winner of this round was {winner}. The loser of this round was {loser}.')
