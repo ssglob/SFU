@@ -84,10 +84,19 @@ def sort_rolls(dict):
         right = right[::-1]
     
     while left and right:
-        if compare(dict[left[0]][0],dict[right[0]][0]) in '1t':
+        if dict[left[0]][1] == dict[right[0]][1]:
+            if compare(dict[left[0]][0],dict[right[0]][0]) in '1t':
+                result.append(left.pop(0))
+            else:
+                result.append(right.pop(0))
+        elif dict[left[0]][1] > dict[right[0]][1]:
             result.append(left.pop(0))
+        elif dict[left[0]][1] == dict[right[0]][1]:
+            winner = random.choice([left,right])
+            result.append(random.choice(winner.pop(0)))
         else:
             result.append(right.pop(0))
+
     if left:
         result.extend(left)
     elif right:
@@ -116,7 +125,7 @@ def humanturn(max_rolls,prev_rolls):
     #
     # Make the dice easier to edit by making it a list
     #
-    dice = [list(i) for i in dice.split('\n')] 
+    dice = [list(i) for i in dice.split('\n')]
     #
     # For the coordinates of o, define a list and the index for the correct dice is roll-1
     #
@@ -132,7 +141,7 @@ def humanturn(max_rolls,prev_rolls):
         rolls_used += 1
         rolls = [random.randint(1,6) for i in range(3)]
 
-        print("\nYour rolls:")
+        print("Your rolls:")
 
         #
         # Copy the empty die
@@ -142,7 +151,7 @@ def humanturn(max_rolls,prev_rolls):
             cur_dice[c] = i[:]
 
         for count in range(3):
-            #get coordinates of o relative to which dice the loop is on 
+            #get coordinates of o relative to which dice the loop is on
             coords = [[i[0],i[1] + count*10] for i in dice_coords[rolls[count]-1]]
             for item in coords:
                 cur_dice[item[0]][item[1]] = 'o'
@@ -261,15 +270,17 @@ def game():
     print('PocoLoco\n')
     time.sleep(1.0)
     print('''Instructions: 
-PocoLoco is played in rounds.  
-In each round, players take turns rolling three dice and try to get the 
-highest score possible. After all the players have taken their turn in 
-a round, the lowest-scoring player is given chips from the other players 
-as described below. If a player doesn't have a special hand, (Loco, Poco, 
+PocoLoco is played in rounds.
+In each round, players take turns rolling three dice and try to get the
+highest score possible. After all the players have taken their turn in
+a round, the lowest-scoring player is given chips from the other players
+as described below. If a player doesn't have a special hand, (Loco, Poco,
 or three-of-a-kind) then the rank is calculated based on the score. The
 score is calculated by adding the score from each dice. The value of each
 roll is as follows (roll: score):
-1: 100, 2: 2, 3: 3, 4: 4, 5: 5, 6: 60
+1: 100   4: 4
+2: 2     5: 5
+3: 3     6: 60
 
 Lowest-scoring player receives:
 1 chip if the winners score is a points total
@@ -277,7 +288,7 @@ Lowest-scoring player receives:
 3 chips if the winners score is any three-of-a-kind
 4 chips if the winners score is 4, 5, 6 (PoCo!)\n
         
-The game ends when a player loses all their chips. 
+The game ends when a player loses all their chips.
 The first player with zero chips is the winner.
     
 If there is a tie, the winner and loser are randomly selected.
@@ -344,14 +355,13 @@ If there is a tie, the winner and loser are randomly selected.
 
         for cur_player in order:
             if cur_player==username:
-                player_turn = humanturn(max_rolls,list(round_rolls.values()))
+                player_turn = humanturn(max_rolls,prev_rolls)
                 round_rolls[cur_player],numofrolls = player_turn
 
             else:
                 round_rolls[cur_player],numofrolls = robotturn(max_rolls,Lowest_roll)
                 
             max_rolls = min(max_rolls,numofrolls)
-            prev_rolls.append(round_rolls[cur_player][:])
 
             #
             # Calculate the roll's rank
@@ -373,6 +383,7 @@ If there is a tie, the winner and loser are randomly selected.
                 roll = f'score: {str(add_score(cur_roll))}'
             round_roll_names[cur_player] = roll
             round_rolls[cur_player] = [round_rolls[cur_player],player_rank]
+            prev_rolls.append(round_rolls[cur_player][0])
 
             #
             # Update Lowest and highest roll
@@ -411,29 +422,29 @@ If there is a tie, the winner and loser are randomly selected.
             
         #
         # decide winner/loser and calculate chips
+        # base winner/loser on sorted_rolls to keep it consistent with the rankings
         #
-        winner = HTied[random.randint(0,len(HTied)-1)] # choose random winner if there is a tie
-        loser = LTied[random.randint(0,len(LTied)-1)] # same as choosing winner
+        sorted_rolls = sort_rolls(round_rolls)
+        winner = sorted_rolls[0]
+        loser = sorted_rolls[-1]
         chip_diff = {}
 
         for key in chips:
             if key==loser:
                 chips[key] += Highest_roll[0] * 3
                 chip_diff[key] = '+' + str(Highest_roll[0] * 3)
-            else:   
+            else:
                 chips[key] -= Highest_roll[0]
                 chip_diff[key] = '-' + str(Highest_roll[0])
             if chips[key] <= 0:
                 chips[key] = 0
                 game_over = True
-        
-        sorted_rolls = sort_rolls(round_rolls)
 
         print('Rolls from this round (sorted):')
-        for key in sorted_rolls:
+        for count,key in enumerate(sorted_rolls):
             player_roll = ''.join([str(i) for i in round_rolls[key][0]])
             roll_name = round_roll_names[key]
-            print(f'{key}: {player_roll} ({roll_name})',end=' ')
+            print(f'{count+1}. {key}: {player_roll} ({roll_name})',end=' ')
             print(f'{chip_diff[key]} chips')
         print()
         
@@ -469,4 +480,3 @@ Loser of the game was {losers[random.randint(0,len(losers)-1)]}''')
 
 def main():
     game()
-main()
