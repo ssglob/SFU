@@ -480,3 +480,5 @@ Loser of the game was {losers[random.randint(0,len(losers)-1)]}''')
 
 def main():
     game()
+
+main()
