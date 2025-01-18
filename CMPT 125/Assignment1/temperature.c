@@ -5,9 +5,9 @@ void main(){
     float T_room = 21.8;
     printf("enter the number of full hours since the power failed: ");
     int hours;
+    int minutes;
     scanf("%d",&hours);
     printf("enter the number of additional minutes since the power failed: ");
-    int minutes;
     scanf("%d",&minutes);
     float power_off = minutes/60.0 + hours/1.0;
     float cur_T = T_start/1.0 + 0.05 * power_off * (T_room-T_start);
