@@ -9,9 +9,8 @@ int main ()
 	   starting angle in degrees
 	   difference in angle between successive rows
        print the titles for each row in the table */
-    int COLUMNS = 3;
-    int COLUMN_WIDTH = 14;
     int numberOfRows;
+    int countData;
     float angle;
     float increment;
     printf("Enter the number of rows in the table to be produced\nThe number of rows must be between 0 and 35\n");
@@ -25,7 +24,7 @@ int main ()
 
 	/* This is a loop executed once for each row of the table
 	   numberOfRows  rows will be printed */
-    for (int countData = 0; countData < numberOfRows; countData++ )
+    for (countData = 0; countData < numberOfRows; countData++ )
     {
 		//ADD CODE HERE TO
 		//print the (countData+1)st line of the table
