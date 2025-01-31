@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <math.h>
-
+/*
+This program takes the length of each side of the equilateral triangle and the length of the prism
+as separate inputs. It calculates and prints the volume of the triangular prism rounded to 2 decimal
+points.
+*/
 void main(){
     float s;
     float L;

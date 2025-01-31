@@ -1,8 +1,17 @@
 #include <stdio.h>
+/*
+The program takes the number of full hours since the power failure and the number of minutes
+since the power failure as separate inputs. It uses the total amount of time since the power
+failure to calculate the final temperature of the freezer based on the defined constants and 
+inputs. It prints the current temperature and the final temperature of the freezer, both
+rounded to 2 decimal places.
 
+T_start is the temperature of the freezer before the power failure.
+T_room is the temperature of the room.
+*/
+#define T_start -10.2
+#define T_room 21.8
 void main(){
-    float T_start = -10.2;
-    float T_room = 21.8;
     printf("enter the number of full hours since the power failed: ");
     int hours;
     int minutes;

@@ -1,5 +1,14 @@
 #include <stdio.h>
+#define _USE_MATH_DEFINES
 #include <math.h>
+/*
+The program takes the number of rows in the table, the angle to start with, and the increment
+between each angle as separate inputs. It calculates the sine and cosine of the angle in each
+iteration, which gets increased by the increment, then prints each value in columns (angle is
+rounded to 2 decimal places, sine and cosine to 4) that are
+each 14 characters wide. The number of rows printed is the inputted numberOfRows + 1 (to 
+include the title).
+*/
 int main ()
 {
 	/* ADD CODE HERE TO
