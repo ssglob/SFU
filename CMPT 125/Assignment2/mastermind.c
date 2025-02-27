@@ -103,18 +103,13 @@ int* matches(int* arr1, int* arr2) {
         index1 = in(&nums1[0],arr2[i]);
         index2 = in(&nums2[0],arr2[i]);
         if (index1 != -1 && index2 != -1) {
-            printf("%d a ",arr2[i]);
             num_match[1]++;
             removes(&nums1[0],index1);
-            for (int i1 = 0;i1 < 6;i1++) {
-                printf("%d",nums1[i1]);
-            }
             removes(&nums2[0],index2);
         }
         index1 = in(&nums2[0],arr1[i]);
         index2 = in(&nums1[0],arr1[i]);
         if (index1 != -1 && index2 != -1) {
-            printf("%d b ",arr1[i]);
             num_match[1]++;
             removes(&nums2[0],index1);
             removes(&nums1[0],index2);
