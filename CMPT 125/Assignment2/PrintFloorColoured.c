@@ -1,3 +1,4 @@
+#include <stdio.h>
 void PrintFloorColoured (FILE* stdStream, int **board, struct Robot *myRobots, int numRows, int numCols, int numRobots)
 {
 	#define YELLOW_PRINT    "\x1b[33m"

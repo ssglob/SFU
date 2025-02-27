@@ -1,3 +1,4 @@
+#include <stdio.h>
 void InitFloorRandStripe(int **board, int numRows, int numCols, unsigned int seed )
 {
 	const int NUM_COLOURS_STRIPES = 6;
