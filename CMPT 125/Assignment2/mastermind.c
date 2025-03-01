@@ -3,6 +3,10 @@
 #define MAX_TURNS 20
 #define MAX_NUM 5
 
+/*This program takes user input and uses it as a seed to generate 6 pseudo-random numbers that are between 0 and 5 inclusive. The program then prompts the user to guess the 6 digits,
+and prints how many matches and partial matches the user got. If the user cannot get the numbers in 20 tries then the program prints something to signal that the game ended, and if 
+the user gets all 6 numbers then the program prints a victory message. In both cases the program terminates.*/
+
 int compare_array(int* arr1, int* arr2) {
     for (int i = 0;i < 6;i++){
         if (arr1[i] != arr2[i]){
@@ -34,7 +38,9 @@ int* check_guess(int* digits_left) {
         checked[i] = -1; /*Want to know when adding numbers to guess, if the number is valid*/
     }
     while(c != '\n' && i < *digits_left) {
-        if (c >= '0' && c <='9') cur_num = c - '0';
+        if (c >= '0' && c <='9') {
+            cur_num = c - '0';
+        }
         if (cur_num > 5){
             checked[0] = cur_num;
             /*clear input*/
@@ -64,7 +70,9 @@ void removes(int* arr, int index) {
     int i = 0;
     for (i = index;i < 5;i++){
         if (arr[i] < 0) {
-            if (i>0) i--;
+            if (i>0) {
+                i--;
+            }
             break;
         }
         arr[i] = arr[i+1];
@@ -74,8 +82,12 @@ void removes(int* arr, int index) {
 
 int in(int* arr, int num) {
     for (int i = 0;i < 6;i++){
-        if (arr[i] < 0) return -1;
-        if (arr[i] == num) return i;
+        if (arr[i] < 0) {
+            return -1;
+        }
+        if (arr[i] == num) {
+            return i;
+        }
     }
     return -1;
 }
@@ -146,7 +158,9 @@ int main(){
         reset_array(&guess[0]);
         printf("Enter your guess, 6 digits \n");
         for(int i = 0;i < 20;i++){
-            if (guesses[i][0] < 0) break;
+            if (guesses[i][0] < 0) {
+                break;
+            }
             printf("Previous guess %d: ",i+1);
             for (int i1 = 0;i1 < 6;i1++) printf("%d ",guesses[i][i1]);
             printf("- %d matches %d partial matches\n",guesses[i][6],guesses[i][7]);
@@ -170,7 +184,9 @@ int main(){
             check = check_guess(&digits_left);
             if (check[0]<=5){
                 for(int i = 0;i < 6;i++){
-                    if (iter>5 || check[i]<0) break;
+                    if (iter>5 || check[i]<0) {
+                        break;
+                    }
                     guess[iter] = check[i];
                     iter++;
                 }

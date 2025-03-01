@@ -2,20 +2,20 @@
 #include <stdlib.h>
 #include <string.h>
 
-const int numRowsLower = 12;
-const int numRowsUpper = 100;
-const int numColsLower = 12;
-const int numColsUpper = 100;
-const int numRobotsLower = 1;
-const int numRobotsUpper = 10;
-const int initTypeValueLower = 1;
-const int initTypeValueUpper = 3;
-const int initSeedLower = 10;
-const int initSeedUpper = 32767;
-const int numIterationsLower = 5;
-const int numIterationsUpper = 2000;
-const int intervalLower = 1;
-/*I define intervalUpper later as it is not a constant value*/
+#define NUMROWSLOWER 12
+#define  NUMROWSUPPER 100
+#define  NUMCOLSLOWER 12
+#define  NUMCOLSUPPER 100
+#define  NUMROBOTSLOWER 1
+#define  NUMROBOTSUPPER 10
+#define  INITTYPEVALUELOWER 1
+#define  INITTYPEVALUEUPPER 3
+#define  INITSEEDLOWER 10
+#define  INITSEEDUPPER 32767
+#define  NUMITERATIONSLOWER 5
+#define  NUMITERATIONSUPPER 2000
+#define  INTERVALLOWER 1
+/*I define intervalUpper later as it is not a constant value that I can define here*/
 
 struct Robot{
     int x;
@@ -24,6 +24,10 @@ struct Robot{
     int paintColour;
 };
 enum initTypeList{ RANDOM_STRIPES = 1, CHECKERBOARD, ALL_MAGENTA};
+
+/*This program takes user input and attempts to open a file whose name is the input. It reads the contents of the file and assigns values to several variables.
+Then, it will generate a floor and robots that will move along the floor. Every iteration the robots will move forward and then turn. The program prints every
+iteration to an output file, and prints the 0th, 1st, and last iteration, as well as any iteration that is divisible by an interval provided by the input file.*/
 
 int isint(char* string, int max) {
     char digits[12] = "1234567890-\n";
@@ -165,9 +169,33 @@ void print_to_file(FILE* file,int** room,int numRows,int numCols){
     }
 }
 void InitFloorChecker(int **floor, int numRows, int numCols) {
+    int white = 0;
+    int rowWhite = 0;
     for (int i = 0;i < numRows;i++) {
+        if (i % 4 == 0) {
+            if (rowWhite == 0) {
+                rowWhite = 1;
+            }
+            else {
+                rowWhite = 0;
+            }
+        }
+        if (rowWhite) {
+            white = 0;
+        }
+        else {
+            white = 1;
+        }
         for (int j = 0;j < numCols;j++) {
-            if ((j % 2 == 0 && i % 2 == 0) || (j % 2 != 0 && i % 2 != 0)) {
+            if (j % 4 == 0) {
+                if (white == 0) {
+                    white = 1;
+                }
+                else {
+                    white = 0;
+                }
+            }
+            if (white) {
                 floor[i][j] = 6;
             }
             else {
@@ -300,45 +328,45 @@ int main() {
                 return 0;
             }
             if (iter == 0) {
-                if (BUFFER > numRowsUpper || BUFFER < numRowsLower) {
-                    fprintf(stderr,"ERROR: The number of rows was outside the specified range (%d to %d inclusive)\n",numRowsLower,numRowsUpper);
+                if (BUFFER > NUMROWSUPPER || BUFFER < NUMROWSLOWER) {
+                    fprintf(stderr,"ERROR: The number of rows was outside the specified range (%d to %d inclusive)\n",NUMROWSLOWER,NUMROWSUPPER);
                     return 0;
                 }
             }
             if (iter == 1) {
-                if (BUFFER > numColsUpper || BUFFER < numColsLower) {
-                    fprintf(stderr,"ERROR: The number of columns was outside the specified range (%d to %d inclusive)\n",numColsLower,numColsUpper);
+                if (BUFFER > NUMCOLSUPPER || BUFFER < NUMCOLSLOWER) {
+                    fprintf(stderr,"ERROR: The number of columns was outside the specified range (%d to %d inclusive)\n",NUMCOLSLOWER,NUMCOLSUPPER);
                     return 0;
                 }
             }
             if (iter == 2) {
-                if (BUFFER > numRobotsUpper || BUFFER < numRobotsLower) {
-                    fprintf(stderr,"ERROR: The number of robots was outside the specified range (%d to %d inclusive) \n",numRobotsLower,numRobotsUpper);
+                if (BUFFER > NUMROBOTSUPPER || BUFFER < NUMROBOTSLOWER) {
+                    fprintf(stderr,"ERROR: The number of robots was outside the specified range (%d to %d inclusive) \n",NUMROBOTSLOWER,NUMROBOTSUPPER);
                     return 0;
                 }
             }
             if (iter == 3) {
-                if (BUFFER > initTypeValueUpper || BUFFER < initTypeValueLower) {
-                    fprintf(stderr,"ERROR: The initialization type was outside the specified range (%d to %d inclusive)\n",initTypeValueLower,initTypeValueUpper);
+                if (BUFFER > INITTYPEVALUEUPPER || BUFFER < INITTYPEVALUELOWER) {
+                    fprintf(stderr,"ERROR: The initialization type was outside the specified range (%d to %d inclusive)\n",INITTYPEVALUELOWER,INITTYPEVALUEUPPER);
                     return 0;
                 }
             }
             if (iter == 4) {
-                if (BUFFER > initSeedUpper || BUFFER < initSeedLower) {
-                    fprintf(stderr,"ERROR: The initialization seed was outside the specified range (%d to %d inclusive) \n",initSeedLower,initSeedUpper);
+                if (BUFFER > INITSEEDUPPER || BUFFER < INITSEEDLOWER) {
+                    fprintf(stderr,"ERROR: The initialization seed was outside the specified range (%d to %d inclusive) \n",INITSEEDLOWER,INITSEEDUPPER);
                     return 0;
                 }
             }
             if (iter == 5) {
-                if (BUFFER > numIterationsUpper || BUFFER < numIterationsLower) {
-                    fprintf(stderr,"ERROR: The number of iterations was outside the specified range (%d to %d inclusive)\n",numIterationsLower,numIterationsUpper);
+                if (BUFFER > NUMITERATIONSUPPER || BUFFER < NUMITERATIONSLOWER) {
+                    fprintf(stderr,"ERROR: The number of iterations was outside the specified range (%d to %d inclusive)\n",NUMITERATIONSLOWER,NUMITERATIONSUPPER);
                     return 0;
                 }
             }
             if (iter == 6) {
                 const int intervalUpper = *numIterations;
-                if (BUFFER > intervalUpper || BUFFER < intervalLower) {
-                    fprintf(stderr,"ERROR: The print interval was outside the specified range (%d to %d inclusive)\n",intervalLower,intervalUpper);
+                if (BUFFER > intervalUpper || BUFFER < INTERVALLOWER) {
+                    fprintf(stderr,"ERROR: The print interval was outside the specified range (%d to %d inclusive)\n",INTERVALLOWER,intervalUpper);
                     return 0;
                 }
             }
@@ -359,7 +387,7 @@ int main() {
                         initTypeValue = CHECKERBOARD;
                     }
                     if (BUFFER == 3) {
-                        initTypeValue = RANDOM_STRIPES;
+                        initTypeValue = ALL_MAGENTA;
                     }
                 }
                 if (iter == 4) {
@@ -440,7 +468,7 @@ int main() {
     /*reuse file*/
     file = fopen(outputfile,"w");
     for (int i = 0;i < *numIterations;i++) {
-        if ((i+1) % *interval == 0 || i == 1) {
+        if ((i+1) % *interval == 0 || i == 1 || i == 0) {
             printf("Iteration %d: ",i);
             if (i == 0) {
                 printf("robots on floor with initial tile pattern");
@@ -450,7 +478,7 @@ int main() {
         }
         fprintf(file,"Iteration %d: ",i);
         if (i == 0) {
-            printf("robots on floor with initial tile pattern");
+            fprintf(file,"robots on floor with initial tile pattern");
         }
         fprintf(file,"\n");
         print_to_file(file,room,*numRows,*numCols);
