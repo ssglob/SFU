@@ -1,5 +1,5 @@
 #include <stdio.h>
 int main(){
-    printf("%d",sizeof(int));
+    printf("%d",(-1+4)%4);
     return 0;
 }

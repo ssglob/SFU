@@ -16,7 +16,6 @@ const int numIterationsLower = 5;
 const int numIterationsUpper = 2000;
 const int intervalLower = 1;
 /*I define intervalUpper later as it is not a constant value*/
-const char colours[4] = "YCGB";
 
 struct Robot{
     int x;
@@ -25,6 +24,27 @@ struct Robot{
     int paintColour;
 };
 enum initTypeList{ RANDOM_STRIPES = 1, CHECKERBOARD, ALL_MAGENTA};
+
+int isint(char* string, int max) {
+    char digits[12] = "1234567890-\n";
+    int digit = 0;
+    for (int i = 0;i < max-1;i++) {
+        if (string[i] == "-" && i > 0) {
+            return 0;
+        }
+        for (int i1 = 0;i1 < 11;i1++) {
+            if (string[i] == digits[i1]) {
+                digit = 1;
+                break;
+            }
+        }
+        if (!digit) {
+            return 0;
+        }
+        digit = 0;
+    }
+    return 1;
+}
 
 void InitFloorAllMagenta(int **floor, int numRows, int numCols) {
     for (int i = 0;i < numRows;i++) {
@@ -191,8 +211,8 @@ int main() {
     int iter1 = 0;
     int file_open_count = 0;
     int ERROR = 0;
-    int BUFFER = -1;
-    int arr[] = {-1,-1,-1,-1,-1}; /*Inputs can't be less than 0 so if it is then we know it's invalid*/
+    int BUFFER = 0;
+    int arr[] = {0,0,0,0,0};
     int** room = NULL;
     struct Robot* myRobots = NULL;
     int* numRows = &arr[0];
@@ -206,17 +226,23 @@ int main() {
 
     while (file_open_count < 5 && file == NULL) {
         inputfile = (char *)malloc(len*sizeof(char));
-        if (inputfile == NULL) return 1;
+        if (inputfile == NULL) {
+            return 1;
+        }
         if (file_open_count > 0) printf("ERROR: input file not opened correctly\n");
         printf("Enter the name of the input file: ");
         while (c!='\n') {
             if (iter == len) {
                 len = len*2;
                 inputfile = realloc(inputfile,len*sizeof(char));
-                if (inputfile == NULL) return 0;
+                if (inputfile == NULL) {
+                    return 0;
+                }
             }
             c = getchar();
-            if (c != '\n') inputfile[iter] = c;
+            if (c != '\n') {
+                inputfile[iter] = c;
+            }
             iter++;
         }
         file = fopen(inputfile,"r");
@@ -234,10 +260,21 @@ int main() {
 
     /*re-use iter here*/
     iter = 0;
-    while (input = fgetc(file) != EOF && iter < 7) {
-        if (input == '\n') {
-            BUFFER = (int)buff;
-            if (BUFFER == -1) ERROR = 1; 
+    input = fgetc(file);
+    while (iter < 8) {
+        // printf("%c",input);
+        if (input == '\n' || input == EOF) {
+            if (iter == 7) {
+                strcpy(outputfile,buff);
+                break;
+            }
+            if (buff[0] == '\0') {
+                break;
+            }
+            if (!isint(&buff[0],iter1)) {
+                ERROR = 1;
+            }
+            BUFFER = atoi(buff);
             if (ERROR) {
                 if (iter == 0) {
                     fprintf(stderr,"ERROR: The number of rows could not be read due to corrupt data in the file\n");
@@ -299,7 +336,7 @@ int main() {
                 }
             }
             if (iter == 6) {
-                const int intervalUpper = arr[5];
+                const int intervalUpper = *numIterations;
                 if (BUFFER > intervalUpper || BUFFER < intervalLower) {
                     fprintf(stderr,"ERROR: The print interval was outside the specified range (%d to %d inclusive)\n",intervalLower,intervalUpper);
                     return 0;
@@ -325,17 +362,20 @@ int main() {
                         initTypeValue = RANDOM_STRIPES;
                     }
                 }
-                if (iter == 4) initSeed = BUFFER;
+                if (iter == 4) {
+                    initSeed = BUFFER;
+                }
             }
             memset(buff,0,sizeof(buff));
             iter++;
             iter1 = 0;
-            BUFFER = -1;
+            BUFFER = 0;
         }
         else {
             buff[iter1] = input;
             iter1++;
         }
+        input = fgetc(file);
     }
     if (input == EOF && iter < 7) {
         if (iter == 0) {
@@ -361,11 +401,6 @@ int main() {
         }
         return 0;
     }
-    iter = 0;
-    while (input = fgetc(file) != '\n' && input != EOF) {
-        outputfile[iter] = input;
-        iter++;
-    }
     fclose(file);
 
     room = (int**)malloc(*numRows*sizeof(int*));
@@ -380,9 +415,15 @@ int main() {
             return 0;
         }
     }
-    if (initTypeValue == 1) InitFloorRandStripe(room,*numRows,*numCols,initSeed);
-    if (initTypeValue == 2) InitFloorChecker(room,*numRows,*numCols);
-    if (initTypeValue == 3) InitFloorAllMagenta(room,*numRows,*numCols);
+    if (initTypeValue == 1) {
+        InitFloorRandStripe(room,*numRows,*numCols,initSeed);
+    }
+    if (initTypeValue == 2) {
+        InitFloorChecker(room,*numRows,*numCols);
+    }
+    if (initTypeValue == 3) {
+        InitFloorAllMagenta(room,*numRows,*numCols);
+    }
     myRobots = (struct Robot*)malloc(*numRobots*sizeof(*myRobots));
     if (myRobots == NULL) {
         fprintf(stderr,"ERROR: Array of robots could not be allocated\n");
@@ -392,12 +433,12 @@ int main() {
         myRobots[i].x = rand() % (*numCols);
         myRobots[i].y = rand() % (*numRows);
         myRobots[i].direction = rand() % 4;
-        myRobots[i].paintColour = (rand() % 4) + 1;
+        myRobots[i].paintColour = (rand() % 4)+1;
         room[myRobots[i].y][myRobots[i].x] = myRobots[i].paintColour;
     }
 
     /*reuse file*/
-    file = fopen(outputfile,"a");
+    file = fopen(outputfile,"w");
     for (int i = 0;i < *numIterations;i++) {
         if ((i+1) % *interval == 0 || i == 1) {
             printf("Iteration %d: ",i);
@@ -416,57 +457,57 @@ int main() {
         fprintf(file,"\n\n");
         /*0 - North, 1 - East, 2 - South, 3 - West*/
         for (int i1 = 0;i1 < *numRobots;i1++) {
-            if (myRobots[*numRobots].direction == 0) {
+            if (myRobots[i1].direction == 0) {
                 for (int j = 0;j < 4;j++) {
-                    myRobots[*numRobots].y = (myRobots[*numRobots].y - 1) % *numRows;
+                    myRobots[i1].y = (myRobots[i1].y - 1 + *numRows) % *numRows;
                     if (j != 3) {
-                        room[myRobots[*numRobots].y][myRobots[*numRobots].x] = myRobots[*numRobots].paintColour;
+                        room[myRobots[i1].y][myRobots[i1].x] = myRobots[i1].paintColour;
                     }
                 }
             }
-            if (myRobots[*numRobots].direction == 1) {
+            if (myRobots[i1].direction == 1) {
                 for (int j = 0;j < 4;j++) {
-                    myRobots[*numRobots].x = (myRobots[*numRobots].x + 1) % *numCols;
+                    myRobots[i1].x = (myRobots[i1].x + 1) % *numCols;
                     if (j != 3) {
-                        room[myRobots[*numRobots].y][myRobots[*numRobots].x] = myRobots[*numRobots].paintColour;
+                        room[myRobots[i1].y][myRobots[i1].x] = myRobots[i1].paintColour;
                     }
                 }
             }
-            if (myRobots[*numRobots].direction == 2) {
+            if (myRobots[i1].direction == 2) {
                 for (int j = 0;j < 4;j++) {
-                    myRobots[*numRobots].y = (myRobots[*numRobots].y + 1) % *numRows;
+                    myRobots[i1].y = (myRobots[i1].y + 1) % *numRows;
                     if (j != 3) {
-                        room[myRobots[*numRobots].y][myRobots[*numRobots].x] = myRobots[*numRobots].paintColour;
+                        room[myRobots[i1].y][myRobots[i1].x] = myRobots[i1].paintColour;
                     }
                 }
             }
-            if (myRobots[*numRobots].direction == 0) {
+            if (myRobots[i1].direction == 0) {
                 for (int j = 0;j < 4;j++) {
-                    myRobots[*numRobots].x = (myRobots[*numRobots].x - 1) % *numCols;
+                    myRobots[i1].x = (myRobots[i1].x - 1 + *numCols) % *numCols;
                     if (j != 3) {
-                        room[myRobots[*numRobots].y][myRobots[*numRobots].x] = myRobots[*numRobots].paintColour;
+                        room[myRobots[i1].y][myRobots[i1].x] = myRobots[i1].paintColour;
                     }
                 }
             }
-            if (room[myRobots[*numRobots].y][myRobots[*numRobots].x] == 1) {
-                myRobots[*numRobots].paintColour = (myRobots[*numRobots].paintColour + 1) % 4;
+            if (room[myRobots[i1].y][myRobots[i1].x] == 1) {
+                myRobots[i1].direction = (myRobots[i1].direction + 1) % 4;
             }
-            if (room[myRobots[*numRobots].y][myRobots[*numRobots].x] == 2) {
-                myRobots[*numRobots].paintColour = (myRobots[*numRobots].paintColour + 2) % 4;
+            if (room[myRobots[i1].y][myRobots[i1].x] == 2) {
+                myRobots[i1].direction = (myRobots[i1].direction + 2) % 4;
             }
-            if (room[myRobots[*numRobots].y][myRobots[*numRobots].x] == 3) {
-                myRobots[*numRobots].paintColour = (myRobots[*numRobots].paintColour + 3) % 4;
+            if (room[myRobots[i1].y][myRobots[i1].x] == 3) {
+                myRobots[i1].direction = (myRobots[i1].direction + 3) % 4;
             }
-            if (room[myRobots[*numRobots].y][myRobots[*numRobots].x] == 4) {
-                myRobots[*numRobots].paintColour = (myRobots[*numRobots].paintColour) % 4;
+            if (room[myRobots[i1].y][myRobots[i1].x] == 4) {
+                myRobots[i1].direction = (myRobots[i1].direction) % 4;
             }
-            if (room[myRobots[*numRobots].y][myRobots[*numRobots].x] == 5) {
-                myRobots[*numRobots].paintColour = (myRobots[*numRobots].paintColour + 1) % 4;
+            if (room[myRobots[i1].y][myRobots[i1].x] == 5) {
+                myRobots[i1].direction = (myRobots[i1].direction + 1) % 4;
             }
-            if (room[myRobots[*numRobots].y][myRobots[*numRobots].x] == 6) {
-                myRobots[*numRobots].paintColour = (myRobots[*numRobots].paintColour + 2) % 4;
+            if (room[myRobots[i1].y][myRobots[i1].x] == 6) {
+                myRobots[i1].direction = (myRobots[i1].direction + 2) % 4;
             }
-            room[myRobots[*numRobots].y][myRobots[*numRobots].x] = myRobots[*numRobots].paintColour;
+            room[myRobots[i1].y][myRobots[i1].x] = myRobots[i1].paintColour;
         }
     }
     printf("Iteration %d:\n",*numIterations);
