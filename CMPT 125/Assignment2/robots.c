@@ -16,6 +16,7 @@ const int numIterationsLower = 5;
 const int numIterationsUpper = 2000;
 const int intervalLower = 1;
 /*I define intervalUpper later as it is not a constant value*/
+const char colours[4] = "YCGB";
 
 struct Robot{
     int x;
@@ -33,6 +34,116 @@ void InitFloorAllMagenta(int **floor, int numRows, int numCols) {
     }
 }
 
+void PrintFloorColoured (FILE* stdStream, int **board, struct Robot *myRobots, int numRows, int numCols, int numRobots)
+{
+	#define YELLOW_PRINT    "\x1b[33m"
+	#define CYAN_PRINT      "\x1b[36m"
+	#define GREEN_PRINT   	"\x1b[32m"
+	#define BLUE_PRINT	"\x1b[34m"
+	#define MAGENTA_PRINT   "\x1b[35m"
+	#define WHITE_PRINT  	"\x1b[37m"
+	#define RESET_PRINT     "\x1b[0m"
+
+	for(int K=0; K<numRows; K++)
+	{
+		for(int J=0; J<numCols; J++)
+		{
+			/* Is there a robot on the tile? */
+		    int isRobot = 0;
+			for (int P = 0; P < numRobots; P++)
+			{
+				if( myRobots[P].y != K) continue;
+				if( myRobots[P].x != J) continue;
+				isRobot = 1;
+			}
+
+
+			switch(board[K][J])
+			{
+				case 1:
+				if(isRobot == 0)
+				{
+					fprintf(stdStream,YELLOW_PRINT"Y"RESET_PRINT);
+				}
+				else
+				{
+					fprintf(stdStream,YELLOW_PRINT"R"RESET_PRINT);
+				}
+				break;
+
+				case 2:
+				if(isRobot == 0)
+				{
+   					fprintf(stdStream, CYAN_PRINT"C"RESET_PRINT);
+				}
+				else
+				{
+					fprintf(stdStream, CYAN_PRINT"R"RESET_PRINT);
+				}
+				break;
+
+				case 3:
+				if(isRobot == 0)
+				{
+   					fprintf(stdStream, GREEN_PRINT"G"RESET_PRINT);
+				}
+				else
+				{
+					fprintf(stdStream, GREEN_PRINT"R"RESET_PRINT);
+				}
+				break;
+
+				case 4:
+				if(isRobot == 0)
+				{
+   					fprintf(stdStream, BLUE_PRINT"B"RESET_PRINT);
+				}
+				else
+				{
+					fprintf(stdStream, BLUE_PRINT"R"RESET_PRINT);
+				}
+				break;
+
+				case 5:
+				if(isRobot == 0)
+				{
+   					fprintf(stdStream, MAGENTA_PRINT"M"RESET_PRINT);
+				}
+				else
+				{
+					fprintf(stdStream, MAGENTA_PRINT"R"RESET_PRINT);
+				}
+				break;
+
+
+				case 6:
+				if(isRobot == 0)
+				{
+   					fprintf(stdStream, WHITE_PRINT"W"RESET_PRINT);
+				}
+				else
+				{
+					fprintf(stdStream, WHITE_PRINT"R"RESET_PRINT);
+				}
+				break;
+
+				default:
+				fprintf(stdStream, "O");
+				break;			}
+		}
+		printf("\n");
+	}
+	printf("\n\n");
+}
+
+void print_to_file(FILE* file,int** room,int numRows,int numCols){
+    for (int i1 = 0;i1 < numRows;i1++) { 
+        for (int j = 0;j < numCols;j++) {
+            fprintf(file,"%d",room[i1][j]);
+        }
+        fprintf(file,"\n");
+    }
+}
 void InitFloorChecker(int **floor, int numRows, int numCols) {
     for (int i = 0;i < numRows;i++) {
         for (int j = 0;j < numCols;j++) {
@@ -86,7 +197,7 @@ int main() {
     struct Robot* myRobots = NULL;
     int* numRows = &arr[0];
     int* numCols = &arr[1];
-    int* numrobots = &arr[2];
+    int* numRobots = &arr[2];
     enum initTypeList initTypeValue = 0;
     unsigned int initSeed = 0;
     int* numIterations = &arr[3];
@@ -255,36 +366,119 @@ int main() {
         outputfile[iter] = input;
         iter++;
     }
-    room = malloc(*numRows*sizeof(int*));
+    fclose(file);
+
+    room = (int**)malloc(*numRows*sizeof(int*));
     if (room == NULL) {
         fprintf(stderr,"ERROR: Array of pointers for 2-D array could not be allocated\n");
         return 0;
     }
-    for (int i = 0;i < numRows;i++) {
-        *room[i] = calloc(*numCols,sizeof(int));
+    for (int i = 0;i < *numRows;i++) {
+        room[i] = calloc(*numCols,sizeof(int));
         if (room[i] == NULL) {
-            fpritnf(stderr,"ERROR: Array storage for the 2-D array could not be allocatedn\n");
+            fprintf(stderr,"ERROR: Array storage for the 2-D array could not be allocatedn\n");
             return 0;
         }
     }
     if (initTypeValue == 1) InitFloorRandStripe(room,*numRows,*numCols,initSeed);
     if (initTypeValue == 2) InitFloorChecker(room,*numRows,*numCols);
     if (initTypeValue == 3) InitFloorAllMagenta(room,*numRows,*numCols);
-    myRobots = (struct Robot*)malloc(*numrobots*sizeof(*myRobots));
+    myRobots = (struct Robot*)malloc(*numRobots*sizeof(*myRobots));
     if (myRobots == NULL) {
         fprintf(stderr,"ERROR: Array of robots could not be allocated\n");
         return 0;
     }
-    for (int i = 0;i < *numrobots;i++) {
-        myRobots[i].x = rand() % (*numRows + 1);
-        myRobots[i].y = rand() % (*numCols + 1);
-        myRobots[i].direction = rand() % 5; /*4 directions possible*/
-        myRobots[i].paintColour = rand() % 5;
-        room[myRobots[i].x][myRobots[i].y] = myRobots[i].paintColour;
+    for (int i = 0;i < *numRobots;i++) {
+        myRobots[i].x = rand() % (*numCols);
+        myRobots[i].y = rand() % (*numRows);
+        myRobots[i].direction = rand() % 4;
+        myRobots[i].paintColour = (rand() % 4) + 1;
+        room[myRobots[i].y][myRobots[i].x] = myRobots[i].paintColour;
     }
 
+    /*reuse file*/
+    file = fopen(outputfile,"a");
+    for (int i = 0;i < *numIterations;i++) {
+        if ((i+1) % *interval == 0 || i == 1) {
+            printf("Iteration %d: ",i);
+            if (i == 0) {
+                printf("robots on floor with initial tile pattern");
+            }
+            printf("\n");
+            PrintFloorColoured(stdout,room,myRobots,*numRows,*numCols,*numRobots);
+        }
+        fprintf(file,"Iteration %d: ",i);
+        if (i == 0) {
+            printf("robots on floor with initial tile pattern");
+        }
+        fprintf(file,"\n");
+        print_to_file(file,room,*numRows,*numCols);
+        fprintf(file,"\n\n");
+        /*0 - North, 1 - East, 2 - South, 3 - West*/
+        for (int i1 = 0;i1 < *numRobots;i1++) {
+            if (myRobots[*numRobots].direction == 0) {
+                for (int j = 0;j < 4;j++) {
+                    myRobots[*numRobots].y = (myRobots[*numRobots].y - 1) % *numRows;
+                    if (j != 3) {
+                        room[myRobots[*numRobots].y][myRobots[*numRobots].x] = myRobots[*numRobots].paintColour;
+                    }
+                }
+            }
+            if (myRobots[*numRobots].direction == 1) {
+                for (int j = 0;j < 4;j++) {
+                    myRobots[*numRobots].x = (myRobots[*numRobots].x + 1) % *numCols;
+                    if (j != 3) {
+                        room[myRobots[*numRobots].y][myRobots[*numRobots].x] = myRobots[*numRobots].paintColour;
+                    }
+                }
+            }
+            if (myRobots[*numRobots].direction == 2) {
+                for (int j = 0;j < 4;j++) {
+                    myRobots[*numRobots].y = (myRobots[*numRobots].y + 1) % *numRows;
+                    if (j != 3) {
+                        room[myRobots[*numRobots].y][myRobots[*numRobots].x] = myRobots[*numRobots].paintColour;
+                    }
+                }
+            }
+            if (myRobots[*numRobots].direction == 0) {
+                for (int j = 0;j < 4;j++) {
+                    myRobots[*numRobots].x = (myRobots[*numRobots].x - 1) % *numCols;
+                    if (j != 3) {
+                        room[myRobots[*numRobots].y][myRobots[*numRobots].x] = myRobots[*numRobots].paintColour;
+                    }
+                }
+            }
+            if (room[myRobots[*numRobots].y][myRobots[*numRobots].x] == 1) {
+                myRobots[*numRobots].paintColour = (myRobots[*numRobots].paintColour + 1) % 4;
+            }
+            if (room[myRobots[*numRobots].y][myRobots[*numRobots].x] == 2) {
+                myRobots[*numRobots].paintColour = (myRobots[*numRobots].paintColour + 2) % 4;
+            }
+            if (room[myRobots[*numRobots].y][myRobots[*numRobots].x] == 3) {
+                myRobots[*numRobots].paintColour = (myRobots[*numRobots].paintColour + 3) % 4;
+            }
+            if (room[myRobots[*numRobots].y][myRobots[*numRobots].x] == 4) {
+                myRobots[*numRobots].paintColour = (myRobots[*numRobots].paintColour) % 4;
+            }
+            if (room[myRobots[*numRobots].y][myRobots[*numRobots].x] == 5) {
+                myRobots[*numRobots].paintColour = (myRobots[*numRobots].paintColour + 1) % 4;
+            }
+            if (room[myRobots[*numRobots].y][myRobots[*numRobots].x] == 6) {
+                myRobots[*numRobots].paintColour = (myRobots[*numRobots].paintColour + 2) % 4;
+            }
+            room[myRobots[*numRobots].y][myRobots[*numRobots].x] = myRobots[*numRobots].paintColour;
+        }
+    }
+    printf("Iteration %d:\n",*numIterations);
+    PrintFloorColoured(stdout,room,myRobots,*numRows,*numCols,*numRobots);
+
+    fprintf(file,"Iteration %d: ",*numIterations);
+    fprintf(file,"\n");
+    print_to_file(file,room,*numRows,*numCols);
+
     /*free memory*/
-    for (int i = 0;i < numRows;i++) {
+    fclose(file);
+    for (int i = 0;i < *numRows;i++) {
         free(room[i]);
     }
     free(room);
