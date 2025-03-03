@@ -452,6 +452,9 @@ int main() {
     if (initTypeValue == 3) {
         InitFloorAllMagenta(room,*numRows,*numCols);
     }
+
+    srand(initSeed);
+
     myRobots = (struct Robot*)malloc(*numRobots*sizeof(*myRobots));
     if (myRobots == NULL) {
         fprintf(stderr,"ERROR: Array of robots could not be allocated\n");
@@ -509,7 +512,7 @@ int main() {
                     }
                 }
             }
-            if (myRobots[i1].direction == 0) {
+            if (myRobots[i1].direction == 3) {
                 for (int j = 0;j < 4;j++) {
                     myRobots[i1].x = (myRobots[i1].x - 1 + *numCols) % *numCols;
                     if (j != 3) {
